@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block band %}
+<section class="band hero"><div class="in">
+  <span class="pill">Static security analysis · Python, JavaScript, PHP</span>
+  <h1>Find the vulnerability before someone else does.</h1>
+  <p>Paste code or drop a file. CodeSentry checks it for injection, hardcoded secrets, unsafe functions and weak cryptography, then gives every issue a severity, a CWE reference and a fix.</p>
+</div></section>{% endblock %}
+{% block body %}
+<form method="post" action="/scan" class="editor pull" id="drop">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span>
+    <input name="name" id="fname" placeholder="File name (optional)" maxlength="60">
+    <select name="lang"><option value="auto">Auto-detect language</option><option value="python">Python</option><option value="javascript">JavaScript</option><option value="php">PHP</option><option value="other">Other</option></select>
+    <label class="up">Upload file<input type="file" id="file" accept=".py,.js,.php,.txt,.ts,.java,.go,.rb" hidden></label>
+    <button type="button" class="ghost" id="sample">Load vulnerable example</button></div>
+  <textarea name="code" id="code" spellcheck="false" placeholder="Paste your code here, or drag a file onto this box…"></textarea>
+  <div class="foot"><span id="count">0 lines</span><button class="go">Scan code</button></div>
+</form>
+<section class="block"><div class="sec-head"><h2>What CodeSentry scans for</h2><a href="/vulnerabilities">See details for each →</a></div>
+  <div class="grid3">{% for x in rules %}<a class="mini {{ x.sev|lower }}" href="/vulnerabilities#{{ x.id }}"><span class="sev">{{ x.sev }}</span><b>{{ x.title }}</b><small>{{ x.cwe }} · {{ x.langs|join(', ') }}</small></a>{% endfor %}</div></section>
+{% endblock %}
+{% block js %}<script>
+const code=document.getElementById('code'),cnt=document.getElementById('count');
+const upd=()=>cnt.textContent=(code.value?code.value.split('\n').length:0)+' lines';
+code.oninput=upd;
+document.getElementById('sample').onclick=()=>{code.value={{ sample|tojson }};document.getElementById('fname').value='vulnerable_app.py';upd();};
+function readFile(f){if(!f)return;const r=new FileReader();r.onload=()=>{code.value=r.result;document.getElementById('fname').value=f.name;upd();};r.readAsText(f);}
+document.getElementById('file').onchange=e=>readFile(e.target.files[0]);
+const d=document.getElementById('drop');
+['dragover','dragenter'].forEach(t=>d.addEventListener(t,e=>{e.preventDefault();d.classList.add('over')}));
+['dragleave','drop'].forEach(t=>d.addEventListener(t,e=>{e.preventDefault();d.classList.remove('over')}));
+d.addEventListener('drop',e=>readFile(e.dataTransfer.files[0]));
+</script>{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}History · CodeSentry{% endblock %}
+{% block band %}<div class="band slim"><div class="in"><h1>Scan history</h1><p>Your most recent scans. Open any report or delete it from inside the report.</p></div></div>{% endblock %}
+{% block body %}<div class="card pull"><table>
+<tr><th>Name</th><th>Language</th><th>Score</th><th>Issues</th><th>Date</th><th></th></tr>
+{% for r in rows %}<tr><td><b>{{ r.name }}</b></td><td>{{ r.lang|capitalize }}</td><td><span class="grade {{ r.grade }}">{{ r.grade }}</span> {{ r.score }}</td>
+<td>{{ r.n }}</td><td class="mute">{{ r.created[:16] }}</td><td><a href="/report/{{ r.id }}">Open report</a></td></tr>
+{% else %}<tr><td colspan="6" class="mute">No scans yet. <a href="/">Run your first scan</a>.</td></tr>{% endfor %}</table></div>{% endblock %}

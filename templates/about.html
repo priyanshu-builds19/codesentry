@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% block title %}About · CodeSentry{% endblock %}
+{% block band %}<div class="band slim"><div class="in"><h1>About CodeSentry</h1><p>A code review and vulnerability scanner that explains every risk it finds.</p></div></div>{% endblock %}
+{% block body %}
+<section class="card pull prose">
+  <h2>What it does</h2>
+  <p>CodeSentry reads source code you paste or upload and checks it for common security flaws. For each issue it shows the exact line, why it is dangerous, how to fix it, and the CWE and OWASP reference. The result is a security score from 0 to 100 and a grade from A to F, with the vulnerable lines highlighted in a source viewer.</p>
+  <p>It is built for students and developers who want a fast first security review of their own code before it reaches GitHub or production.</p>
+</section>
+<div class="grid3 steps">
+  <div class="card"><span class="num">1</span><h3>Submit code</h3><p>Paste it or drag in a file. The language is detected automatically, or you can choose it.</p></div>
+  <div class="card"><span class="num">2</span><h3>Analyse</h3><p>Python is parsed into a syntax tree (AST) so checks follow real code structure. JavaScript, PHP and secrets use pattern rules.</p></div>
+  <div class="card"><span class="num">3</span><h3>Review</h3><p>Browse findings by severity, jump to the line, export JSON, print the report, or ask AI for a second opinion.</p></div>
+</div>
+<section class="card prose"><h2>How the score works</h2>
+<p>The score starts at 100. Each finding subtracts points by severity: Critical 25, High 15, Medium 7, Low 3. A is 90 and above, B 75 and above, C 60 and above, D 40 and above, and F below 40.</p></section>
+<div class="two-col">
+  <section class="card prose"><h2>Privacy and safety</h2><p>Your code is only read, never executed. Scans are stored in a local SQLite database on the machine running the app, and you can delete any report. The optional AI review sends the code to the AI provider only when you press the button and have set an API key.</p></section>
+  <section class="card prose"><h2>Known limitations</h2><p>Static analysis has false positives and cannot understand business logic, so it will not find a broken login flow or a missing permission check. Use it as a first pass, then review by hand. {{ n }} rules are covered today, and new ones are easy to add in <code>scanner.py</code>.</p></section>
+</div>
+<section class="card prose"><h2>Key features</h2>
+<ul class="list">
+  <li>Python AST analysis, so checks follow real code structure instead of plain text matching</li>
+  <li>{{ n }} detection rules mapped to CWE and the OWASP Top 10</li>
+  <li>Security score from 0 to 100 with an A to F grade</li>
+  <li>Source viewer with the vulnerable lines highlighted and linked to each finding</li>
+  <li>JSON export, print-ready reports and a full scan history</li>
+  <li>Optional AI review for logic and authentication issues the rules cannot see</li>
+</ul>
+<p>Built as an MCA project to practise secure coding, static analysis and full-stack development.</p></section>
+{% endblock %}

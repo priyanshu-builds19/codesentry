@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}CodeSentry · Code review & vulnerability scanner{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head><body>
+<header class="nav"><div class="in">
+  <a class="brand" href="/"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5l-8-3Z" fill="#7c5cff"/><path d="m8.5 12 2.6 2.6L16 9.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>CodeSentry</a>
+  <nav>
+    <a href="/" class="{{ 'on' if request.endpoint == 'index' }}">Scan</a>
+    <a href="/vulnerabilities" class="{{ 'on' if request.endpoint == 'vulnerabilities' }}">Vulnerabilities</a>
+    <a href="/history" class="{{ 'on' if request.endpoint == 'history' }}">History</a>
+    <a href="/about" class="{{ 'on' if request.endpoint == 'about' }}">About</a>
+  </nav></div></header>
+{% block band %}{% endblock %}
+<main>{% for m in get_flashed_messages() %}<div class="flash">{{ m }}</div>{% endfor %}{% block body %}{% endblock %}</main>
+<footer><div class="in"><b>CodeSentry</b><span>Reads your code but never runs it. Static analysis can miss issues, so treat results as a first review, not a guarantee.</span></div></footer>
+{% block js %}{% endblock %}
+</body></html>

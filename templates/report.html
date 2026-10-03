@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% block title %}{{ r.name }} · CodeSentry{% endblock %}
+{% block band %}<div class="band slim"><div class="in"><h1>{{ r.name }}</h1><p>{{ r.lang|capitalize }} · {{ lines|length }} lines · scanned {{ r.created[:16] }}</p></div></div>{% endblock %}
+{% block body %}
+<section class="top card pull">
+  <div class="ring {{ r.grade }}"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" class="bg"/><circle cx="60" cy="60" r="54" class="fg" style="--off:{{ 339.3 * (1 - r.score / 100) }}"/></svg>
+    <div><b>{{ r.score }}</b><span>Grade {{ r.grade }}</span></div></div>
+  <div class="sum"><div class="chips">{% for k, v in counts.items() %}<button class="chip {{ k|lower }}" data-sev="{{ k }}"><i></i>{{ v }} {{ k }}</button>{% endfor %}</div>
+    <div class="acts"><a class="btn ghost" href="/report/{{ r.id }}.json">Download JSON</a><button class="btn ghost" onclick="print()">Print report</button>
+      <form method="post" action="/report/{{ r.id }}/delete" onsubmit="return confirm('Delete this report?')"><button class="btn ghost red">Delete</button></form></div></div>
+</section>
+{% if r.note %}<div class="flash">{{ r.note }}</div>{% endif %}
+<div class="split">
+  <section class="finds">
+    <h2>{{ findings|length }} finding{{ '' if findings|length == 1 else 's' }}</h2>
+    {% for f in findings %}
+    <article class="find {{ f.sev|lower }}" data-sev="{{ f.sev }}" data-line="{{ f.line }}">
+      <header><span class="sev">{{ f.sev }}</span><b>{{ f.title }}</b><span class="mute">Line {{ f.line }}</span></header>
+      <code class="snip">{{ f.snippet }}</code>
+      <p>{{ f.why }}</p>
+      <p class="fix"><b>Fix:</b> {{ f.fix }}</p>
+      <footer><span>{{ f.cwe }}</span><span>OWASP {{ f.owasp }}</span></footer>
+    </article>
+    {% else %}<div class="card clean"><b>No issues found.</b><p class="mute">The rules found nothing. Keep reviewing logic and authentication by hand.</p></div>{% endfor %}
+    <div class="card" id="ai"><h3>AI deep review</h3>
+      {% if r.ai %}<pre class="ai">{{ r.ai }}</pre>
+      {% elif ai_enabled %}<p class="mute">Ask an AI model for a second opinion on logic and auth issues the rules cannot detect.</p>
+        <form method="post" action="/report/{{ r.id }}/ai"><button class="btn">Run AI review</button></form>
+      {% else %}<p class="mute">Optional. Set the <code>ANTHROPIC_API_KEY</code> environment variable and restart to enable this.</p>{% endif %}</div>
+  </section>
+  <section class="viewer"><h2>Source</h2>
+    <div class="code" id="code">{% for l in lines %}<div class="ln {{ 'hit ' ~ heat[loop.index]|lower if loop.index in heat }}" id="L{{ loop.index }}" data-line="{{ loop.index }}"><i>{{ loop.index }}</i><span>{{ l or ' ' }}</span></div>{% endfor %}</div>
+  </section>
+</div>
+{% endblock %}
+{% block js %}<script>
+const code=document.getElementById('code');
+function flash(el){el.classList.remove('flashing');void el.offsetWidth;el.classList.add('flashing');}
+document.querySelectorAll('.find').forEach(c=>c.onclick=()=>{const l=document.getElementById('L'+c.dataset.line);
+  code.scrollTo({top:l.offsetTop-code.clientHeight/3,behavior:'smooth'});flash(l);});
+document.querySelectorAll('.ln.hit').forEach(l=>l.onclick=()=>{const c=document.querySelector('.find[data-line="'+l.dataset.line+'"]');
+  if(c){c.scrollIntoView({behavior:'smooth',block:'center'});flash(c);}});
+document.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{ch.classList.toggle('off');
+  const off=[...document.querySelectorAll('.chip.off')].map(x=>x.dataset.sev);
+  document.querySelectorAll('.find').forEach(f=>f.hidden=off.includes(f.dataset.sev));});
+</script>{% endblock %}

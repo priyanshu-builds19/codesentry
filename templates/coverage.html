@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}Vulnerabilities we detect · CodeSentry{% endblock %}
+{% block band %}<div class="band slim"><div class="in"><h1>Vulnerabilities we detect</h1>
+<p>{{ rules|length }} detection rules across Python, JavaScript and PHP, each mapped to a CWE entry and an OWASP Top 10 category.</p></div></div>{% endblock %}
+{% block body %}
+<div class="legend card pull"><b>Severity</b>
+{% for s in ['Critical','High','Medium','Low'] %}<span class="sev {{ s|lower }}">{{ s }}</span>{% endfor %}
+<span class="mute">CWE = Common Weakness Enumeration · OWASP = Top 10 web application risks</span></div>
+<div class="rules">{% for x in rules %}
+<article class="rule {{ x.sev|lower }}" id="{{ x.id }}">
+  <header><span class="sev">{{ x.sev }}</span><h3>{{ x.title }}</h3></header>
+  <p>{{ x.why }}</p>
+  <p class="fix"><b>How to fix:</b> {{ x.fix }}</p>
+  <footer><span>{{ x.cwe }}</span><span>OWASP {{ x.owasp }}</span>{% for l in x.langs %}<span class="lang">{{ l }}</span>{% endfor %}</footer>
+</article>{% endfor %}</div>
+{% endblock %}
